@@ -1,0 +1,219 @@
+{% load bootstrap5 %}
+{% load widget_tweaks %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{% block bootstrap5_content %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FYP Dashboard</title>
+  <!-- Include Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+
+    .container {
+      margin-top: 30px;
+    }
+
+    /* Custom styles for the animated cards */
+    .user-card {
+      background-color: #ffffff;
+      border-radius: 5px;
+      padding: 20px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .user-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .user-card.active {
+      background-color: #007bff; /* Change to your desired active color */
+      color: #fff; /* Change to your desired text color */
+    }
+
+    .user-card .card-title {
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    /* Custom styles for the chart containers */
+    .chart-container {
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    #chart1 {
+      height: 400px;
+    }
+
+    #chart2,
+    #chart3,
+    #chart4 {
+      height: 100px;
+    }
+
+    #chart5,
+    #chart6 {
+      height: 200px;
+    }
+
+    @media (max-width: 768px) {
+      #chart1 {
+        height: 300px;
+      }
+
+      #chart2,
+      #chart3,
+      #chart4 {
+        height: 75px;
+      }
+
+      #chart5,
+      #chart6 {
+        height: 150px;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-3">
+        <h3 class="text-center">Stock Market Price Prediction System</h1>
+        <div class="row">
+          <div class="col-lg-6">
+            <div class="user-card" onclick="selectUser('basicContainer', this)">
+              <h5 class="card-title">Basic</h5>
+              <p>Basic operations</p>
+            </div>
+          </div> 
+          <div class="col-lg-6">
+            <div class="user-card" onclick="selectUser('expertContainer', this)">
+              <h5 class="card-title">Expert</h5>
+              <p>Advanced operations</p>
+            </div>
+          </div>
+        </div>
+        
+        <br />
+
+        <div id="containerWrapper">
+          <div id="basicContainer">
+            <form method="POST">
+              {% csrf_token %}
+              <div class="form-group">
+                <label for="basicInput">Target Stock:</label>
+                {% render_field form.name class="form-control fs-3 text-center" id="basicInput" type="text"%}
+              </div>
+            </form>
+          </div>
+
+          <div id="expertContainer" style="display: none;">
+            <form>
+              <div class="form-group">
+                <label for="expertInput">Target Stock:</label>
+                {% render_field form.name class="form-control fs-3 text-center" id="expertInput" type="text"%}
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="col-lg-9">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="chart-container" id="chart1"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-4">
+            <div class="chart-container" id="chart2"></div>
+          </div>
+          <div class="col-lg-4">
+            <div class="chart-container" id="chart3"></div>
+          </div>
+          <div class="col-lg-4">
+            <div class="chart-container" id="chart4"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="chart-container" id="chart5"></div>
+              </div>
+              <div class="col-lg-6">
+                <div class="chart-container" id="chart6"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function selectUser(containerId, card) {
+      const containers = document.querySelectorAll('.user-card');
+
+      containers.forEach(function (container) {
+        container.classList.remove('active');
+      });
+
+      card.classList.add('active');
+
+      if (containerId === 'basicContainer') {
+        document.getElementById('basicContainer').style.display = 'block';
+        document.getElementById('expertContainer').style.display = 'none';
+      } else {
+        document.getElementById('expertContainer').style.display = 'block';
+        document.getElementById('basicContainer').style.display = 'none';
+      }
+    }
+  </script>
+</body>
+
+{% endblock %}
+
+  {% comment %} <script>
+    const roleRange = document.getElementById('role-range');
+    roleRange.addEventListener('input', function() {
+      const value = parseInt(roleRange.value);
+      const roleLabel = value === 0 ? 'User' : 'Expert';
+      console.log(roleLabel);
+      // Perform any additional actions based on the selected role
+    });
+  </script> {% endcomment %}
+
+        {% comment %} <h1>{% block title %}(no title){% endblock %}</h1>
+
+        {% block content %}(no content){% endblock %}
+
+
+
+{% comment %} {% buttons %}
+    <button type="submit" class="btn btn-secondary">Submit</button>
+{% endbuttons %}  {% endcomment %}
+
+

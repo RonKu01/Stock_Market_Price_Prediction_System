@@ -18,7 +18,8 @@
 %pip install pandas-datareader
 %pip install tabulate
 %pip install ta
-%pip install lime
-%pip install shap
 %pip install keras
 %pip install tensorflow
+%pip install django
+%pip install django-widget-tweaks
+%pip install django-bootstrap-v5
