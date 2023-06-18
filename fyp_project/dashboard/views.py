@@ -3,6 +3,8 @@ from .forms import StockForm
 import yfinance as yf
 import pickle
 import pandas as pd
+import plotly.graph_objects as go
+from plotly.offline import plot
 
 df = pd.read_csv('dashboard/models/df.csv')
 X = pd.read_csv('dashboard/models/X.csv')
@@ -31,154 +33,119 @@ def dashboard(request):
 
             if userType == 'basic':
                 SelectedStock = form.cleaned_data['name']
-                print(SelectedStock, userType)
 
-                df = yf.download(
-                    SelectedStock, start="2019-09-01", end="2022-09-01")
-                df = df.asfreq("B", method="pad").sort_index()
+                last_index_date = df['Date'].tail(1).astype('str').values[0]
+                start_index_date = df['Date'].tail(30).head(1).astype('str').values[0]
 
-                test = round(len(df) * 0.1)
-                data_test = df.iloc[-test:, :]
+                # Download latest 30 days historical price data from Yahoo Finance and store in a pandas DataFrame
+                df_actual = yf.download("GOOGL", start=start_index_date, end=last_index_date, progress=False)
+            
+                # number_of_days = len(df_actual)
+                # last_n_days = df[-number_of_days:]
 
-                real_data = yf.download(
-                    SelectedStock, start="2022-09-01", end="2022-12-01")
-                real_data = real_data.iloc[:, :].asfreq("B").sort_index()
-                real_data = real_data.bfill().ffill()
-                df2 = real_data.drop(
-                    ['Open', 'High', 'Low', 'Adj Close', 'Volume'], axis=1)
+                # last_n_days_df = pd.DataFrame(
+                #     last_n_days, columns=X.columns)
 
-                # region SVR configuration
-                sk_svr = load('dashboard/ML_Models/ml_models_3years/sk_svr.pkl')
-                last_window = data_test['Close'][-sk_svr.window_size:]
-                prediction = sk_svr.predict(steps=len(real_data), exog=real_data[[
-                                            'Open', 'Adj Close', 'High', 'Low', 'Volume']], last_window=last_window)
-                df2['Prediction'] = prediction
+                # X_pred = scaler.transform(last_n_days_df)
 
-                svr_graphs = []
-                svr_graphs.append(
-                    go.Scatter(
-                        x=df2.index, y=df2['Prediction'], mode='lines', name='Prediction')
-                )
-                svr_graphs.append(
-                    go.Scatter(
-                        x=df2.index, y=df2['Close'], mode='lines', name='Close')
-                )
-                svr_layout = {
-                    'title': 'Support Vector Regression (SVR)',
-                    'xaxis_title': 'Year',
-                    'yaxis_title': 'Price',
-                    'height': 300,
-                    'width': 500,
-                }
+                # y_svr_pred = svr_model.predict(X_pred) 
+                # y_rfr_pred = rfr_model.predict(X_pred)
+                # y_voting_pred = voting_model.predict(X_pred)
 
-                # Getting HTML needed to render the plot.
-                sk_svr = plot({'data': svr_graphs, 'layout': svr_layout},
-                            output_type='div')
+                # df_pred = pd.DataFrame({'SVR Prediction': y_svr_pred,
+                #         'RFR Prediction': y_rfr_pred,
+                #         'Voting Prediction': y_voting_pred}, index=df_actual.index)
 
-                # endregion
+                # df_combined = pd.concat([df_actual, df_pred], axis=1)
 
-                # region Ridge configuration
-                sk_ridge = load(
-                    'dashboard/ML_Models/ml_models_3years/sk_ridge.pkl')
-                last_window = data_test['Close'][-sk_ridge.window_size:]
-                prediction = sk_ridge.predict(steps=len(real_data), exog=real_data[[
-                    'Open', 'Adj Close', 'High', 'Low', 'Volume']], last_window=last_window)
-                df2['Prediction'] = prediction
+                # forecast_dates = pd.date_range(start=df.index[-1] + pd.DateOffset(days=1), periods=10, freq='B')
+                # df_forecast = pd.DataFrame(index=forecast_dates)
 
-                ridge_graphs = []
-                ridge_graphs.append(
-                    go.Scatter(
-                        x=df2.index, y=df2['Prediction'], mode='lines', name='Prediction')
-                )
-                ridge_graphs.append(
-                    go.Scatter(
-                        x=df2.index, y=df2['Close'], mode='lines', name='Close')
-                )
-                ridge_layout = {
-                    'title': 'Ridge Regression',
-                    'xaxis_title': 'Year',
-                    'yaxis_title': 'Price',
-                    'height': 300,
-                    'width': 500,
-                }
+                # # Get the last available historical data
+                # last_data = X.iloc[-10:, :]  # Get the last 35 data points, assuming each row represents a sample
 
-                # Getting HTML needed to render the plot.
-                sk_ridge = plot({'data': ridge_graphs, 'layout': ridge_layout},
-                                output_type='div')
+                # # Preprocess the forecast data by scaling it using the same scaler used for training
+                # last_data_scaled = scaler.transform(last_data)
 
-                # endregion
+                # # Make predictions for the forecast period using the SVR and RFR models
+                # svr_prediction = svr_model.predict(last_data_scaled)
+                # rfr_prediction = rfr_model.predict(last_data_scaled)
+                # voting_prediction = voting_model.predict(last_data_scaled)
 
-                # region KNR configuration
-                sk_knr = load(
-                    'dashboard/ML_Models/ml_models_3years/sk_knr.pkl')
-                last_window = data_test['Close'][-sk_knr.window_size:]
-                prediction = sk_knr.predict(steps=len(real_data), exog=real_data[[
-                    'Open', 'Adj Close', 'High', 'Low', 'Volume']], last_window=last_window)
-                df2['Prediction'] = prediction
+                # # Assign the forecasted prices to the DataFrame columns
+                # df_forecast['SVR Prediction'] = svr_prediction
+                # df_forecast['RFR Prediction'] = rfr_prediction
+                # df_forecast['Voting Prediction'] = voting_prediction
 
-                knr_graphs = []
-                knr_graphs.append(
-                    go.Scatter(
-                        x=df2.index, y=df2['Prediction'], mode='lines', name='Prediction')
-                )
-                knr_graphs.append(
-                    go.Scatter(
-                        x=df2.index, y=df2['Close'], mode='lines', name='Close')
-                )
-                knr_layout = {
-                    'title': 'K-Nearest Neighbors Regression (KNR)',
-                    'xaxis_title': 'Year',
-                    'yaxis_title': 'Price',
-                    'height': 300,
-                    'width': 500,
-                }
+                # # Set the display format for float values
+                # pd.set_option('display.float_format', lambda x: '%.3f' % x)
 
-                # Getting HTML needed to render the plot.
-                sk_knr = plot({'data': knr_graphs, 'layout': knr_layout},
-                            output_type='div')
+                # df_combined2 = pd.concat([df_combined, df_forecast])
 
-                # endregion
+                # # region Forecast
+                # forecast_graphs = []
+                # forecast_graphs.append(
+                #     go.Scatter(
+                #         x=df_combined2.index,
+                #         y=df_combined2['Close'],
+                #         mode='lines',
+                #         name='Historical'
+                #     )
+                # )
 
-                # region RFR configuration
-                sk_rfr = load(
-                    'dashboard/ML_Models/ml_models_3years/sk_rfr.pkl')
-                last_window = data_test['Close'][-sk_rfr.window_size:]
-                prediction = sk_rfr.predict(steps=len(real_data), exog=real_data[[
-                    'Open', 'Adj Close', 'High', 'Low', 'Volume']], last_window=last_window)
-                df2['Prediction'] = prediction
+                # forecast_graphs.append(
+                #     go.Scatter(
+                #         x=df_combined2.index,
+                #         y=df_combined2['SVR Prediction'],
+                #         mode='lines',
+                #         name='SVR Prediction'
+                #     )             
+                # )
 
-                rfr_graphs = []
-                rfr_graphs.append(
-                    go.Scatter(
-                        x=df2.index, y=df2['Prediction'], mode='lines', name='Prediction')
-                )
-                rfr_graphs.append(
-                    go.Scatter(
-                        x=df2.index, y=df2['Close'], mode='lines', name='Close')
-                )
-                rfr_layout = {
-                    'title': 'Random Forest Regression (RFR)',
-                    'xaxis_title': 'Year',
-                    'yaxis_title': 'Price',
-                    'height': 300,
-                    'width': 500,
-                }
+                # forecast_graphs.append(
+                #     go.Scatter(
+                #         x=df_combined2.index,
+                #         y=df_combined2['RFR Prediction'],
+                #         mode='lines',
+                #         name='RFR Prediction'
+                #     )             
+                # )
 
-                # Getting HTML needed to render the plot.
-                sk_rfr = plot({'data': rfr_graphs, 'layout': rfr_layout},
-                            output_type='div')
+                # forecast_graphs.append(
+                #     go.Scatter(
+                #         x=df_combined2.index,
+                #         y=df_combined2['Voting Prediction'],
+                #         mode='lines',
+                #         name='Voting Prediction'
+                #     )             
+                # )
 
-                # endregion
+                # # Create layout
+                # layout = go.Layout(
+                #     title='Actual Price and Predictions',
+                #     xaxis=dict(title='Date'),
+                #     yaxis=dict(title='Price'),
+                #     showlegend=True
+                # )
 
+                # # svr_layout = {
+                # #     'title': 'Support Vector Regression (SVR)',
+                # #     'xaxis_title': 'Year',
+                # #     'yaxis_title': 'Price',
+                # #     'height': 300,
+                # #     'width': 500,
+                # # }
 
+                # # Getting HTML needed to render the plot.
+                # forecast = plot({'data': forecast_graphs, 'layout': layout},
+                #             output_type='div')
 
-
-                
+                # # endregion
 
                 context = {'form': form,
                 'SelectedStock': SelectedStock,
                 'userType': userType,
-                # 'sk_svr': sk_svr,
+                # 'forecast': forecast,
                 # 'sk_ridge': sk_ridge,
                 # 'sk_knr': sk_knr,
                 # 'sk_rfr': sk_rfr, 
@@ -187,11 +154,6 @@ def dashboard(request):
 
 
 
-
-
-
-
-            
             else:
                 SelectedStock = form.cleaned_data['name']
                 print(SelectedStock, userType)
