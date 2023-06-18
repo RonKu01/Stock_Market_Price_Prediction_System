@@ -184,6 +184,14 @@ def dashboard(request):
                 # 'sk_rfr': sk_rfr, 
                 }
             
+
+
+
+
+
+
+
+            
             else:
                 SelectedStock = form.cleaned_data['name']
                 print(SelectedStock, userType)
