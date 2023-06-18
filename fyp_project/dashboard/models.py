@@ -6,10 +6,15 @@ class Stock(models.Model):
     Microsoft = 'MSFT'
 
     STOCK_CHOICES = [
-        (Apple, 'AAPL'),
         (Google, 'GOOGL'),
+        (Apple, 'AAPL'),
         (Microsoft, 'MSFT'),
     ]
 
+
+    userType = models.CharField(max_length=10)
+    
     name = models.CharField(
         max_length=10, choices=STOCK_CHOICES, default=Google)
+    
+    

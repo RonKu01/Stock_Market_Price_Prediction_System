@@ -98,45 +98,55 @@
 <body>
   <div class="container">
     <div class="row">
+
+      <!-- Configurations Section -->
       <div class="col-lg-3">
         <h3 class="text-center">Stock Market Price Prediction System</h1>
+        <br />
         <div class="row">
+          <label>Role:</label>
           <div class="col-lg-6">
-            <div class="user-card" onclick="selectUser('basicContainer', this)">
-              <h5 class="card-title">Basic</h5>
-              <p>Basic operations</p>
+            <div class="user-card" id="basic" onclick="selectUser('basicContainer', this)">
+              <h5 class="card-title text-center">Basic</h5>
+              {% comment %} <p>Basic operations</p> {% endcomment %}
             </div>
           </div> 
           <div class="col-lg-6">
-            <div class="user-card" onclick="selectUser('expertContainer', this)">
-              <h5 class="card-title">Expert</h5>
-              <p>Advanced operations</p>
+            <div class="user-card" id="expert" onclick="selectUser('expertContainer', this)">
+              <h5 class="card-title text-center">Expert</h5>
+              {% comment %} <p>Advanced operations</p> {% endcomment %}
             </div>
           </div>
         </div>
-        
+          
         <br />
 
         <div id="containerWrapper">
+
           <div id="basicContainer">
-            <form method="POST">
+            <form id="basicForm" method="POST">
               {% csrf_token %}
+              <input type="hidden", name="userType", value="basic" />
               <div class="form-group">
                 <label for="basicInput">Target Stock:</label>
-                {% render_field form.name class="form-control fs-3 text-center" id="basicInput" type="text"%}
+                {% render_field form.name class="form-control fs-3 text-center" id="basicInput" type="text" onchange="submitBasicForm()" %}
               </div>
             </form>
           </div>
 
           <div id="expertContainer" style="display: none;">
-            <form>
+            <form id="expertForm" method="POST">
+              {% csrf_token %}
+              <input type="hidden", name="userType", value="expert" />
               <div class="form-group">
                 <label for="expertInput">Target Stock:</label>
-                {% render_field form.name class="form-control fs-3 text-center" id="expertInput" type="text"%}
+                {% render_field form.name class="form-control fs-3 text-center" id="expertInput" type="text" onchange="submitExpertForm()" %} 
               </div>
             </form>
           </div>
         </div>
+        
+        
       </div>
 
       <!-- Charts Section -->
@@ -170,19 +180,22 @@
           </div>
         </div>
       </div>
+
+
+
     </div>
   </div>
 
   <script>
     function selectUser(containerId, card) {
       const containers = document.querySelectorAll('.user-card');
-
-      containers.forEach(function (container) {
+  
+      containers.forEach(function(container) {
         container.classList.remove('active');
       });
-
+  
       card.classList.add('active');
-
+  
       if (containerId === 'basicContainer') {
         document.getElementById('basicContainer').style.display = 'block';
         document.getElementById('expertContainer').style.display = 'none';
@@ -191,29 +204,16 @@
         document.getElementById('basicContainer').style.display = 'none';
       }
     }
+    
+    function submitBasicForm() {
+      document.getElementById('basicForm').submit();
+    }
+
+    function submitExpertForm() {
+      document.getElementById('expertForm').submit();
+    }
   </script>
+  
 </body>
 
 {% endblock %}
-
-  {% comment %} <script>
-    const roleRange = document.getElementById('role-range');
-    roleRange.addEventListener('input', function() {
-      const value = parseInt(roleRange.value);
-      const roleLabel = value === 0 ? 'User' : 'Expert';
-      console.log(roleLabel);
-      // Perform any additional actions based on the selected role
-    });
-  </script> {% endcomment %}
-
-        {% comment %} <h1>{% block title %}(no title){% endblock %}</h1>
-
-        {% block content %}(no content){% endblock %}
-
-
-
-{% comment %} {% buttons %}
-    <button type="submit" class="btn btn-secondary">Submit</button>
-{% endbuttons %}  {% endcomment %}
-
-
