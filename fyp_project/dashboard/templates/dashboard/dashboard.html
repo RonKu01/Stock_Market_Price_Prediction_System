@@ -145,25 +145,24 @@
         <h3 class="text-center">Stock Market Price Prediction System</h1>
         <br />
         <div class="row">
-          <label>Role:</label>
+          {% comment %} <label>Role:</label>
           <div class="col-lg-6">
             <div class="user-card" id="basic" onclick="selectUser('basicContainer', this)">
               <h5 class="card-title text-center">Basic</h5>
-              {% comment %} <p>Basic operations</p> {% endcomment %}
+              
             </div>
           </div> 
           <div class="col-lg-6">
             <div class="user-card" id="expertxxx" onclick="selectUser('expertContainer', this)">
               <h5 class="card-title text-center">Expert</h5>
-              {% comment %} <p>Advanced operations</p> {% endcomment %}
+              
             </div>
-          </div>
+          </div> {% endcomment %}
         </div>
           
         <br />
 
         <div id="containerWrapper">
-
           <div id="basicContainer">
             <form id="form" method="POST">
               {% csrf_token %}
@@ -184,10 +183,8 @@
               </div>
               
               <div id="expert" class="expert-container" style="display: none;">
-                <h4 class="expert-title">Expert Mode</h4>
-              
-                <br />
-              
+                <h2 class="expert-title">Expert Mode</h2>
+
                 <div class="form-group">
                   <label for="ml_model">ML Model:</label>
                   {% render_field form.ml_model class="form-control fs-3 text-center" id="ml_model" type="text" %} 
@@ -197,49 +194,16 @@
               
                 <div class="form-group">
                   <label for="num_of_days">Number of Prediction Days:</label>
-                  {% render_field form.num_of_days class="form-control fs-3 text-center" id="num_of_days" type="text" %} 
+                  {% render_field form.num_of_days class="form-control fs-3 text-center" id="num_of_days" type="number" min="5" max="20" %}
                 </div>
+
+                <br />
+
+                <button class="btn btn-primary btn-lg" type="submit">Submit</button>
               </div>
-              
-              <br />
-              
-              <button class="btn btn-primary btn-lg" type="submit">Submit</button>
-              
-            </form>
-          </div>
-
-
-
-          <div id="expertContainer" style="display: none;">
-            <form id="form" method="POST">
-              {% csrf_token %}
-              <div class="form-group">
-                <label for="expertInput">Target Stock:</label>
-                {% render_field form.name class="form-control fs-3 text-center" id="expertInput" type="text" %} 
-              </div>
-
-              <br />
-
-              <div class="form-group">
-                <label for="expertInput">ML Models:</label>
-                {% render_field form.ml_model class="form-control fs-3 text-center" id="expertInput" type="text" %} 
-              </div>
-
-              <br />
-
-              <div class="form-group">
-                <label for="expertInput">Number of Prediction Days:</label>
-                {% render_field form.num_of_days class="form-control fs-3 text-center" id="expertInput" type="text" %} 
-              </div>
-
-              <br />
-
-              <button class="btn btn-primary btn-lg" type="submit">Submit</button>
             </form>
           </div>
         </div>
-        
-        
       </div>
 
       <!-- Charts Section -->
