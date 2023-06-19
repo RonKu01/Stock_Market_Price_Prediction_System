@@ -1,5 +1,6 @@
 {% load bootstrap5 %}
 {% load widget_tweaks %}
+{% load static %}
 
 {# Load CSS and JavaScript #}
 {% bootstrap_css %}
@@ -13,16 +14,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FYP Dashboard</title>
-  <!-- Include Bootstrap CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
 
   <style>
     body {
       background-color: #f8f9fa;
+      /* background-image: url("{% static '/dashboard/bg_page1.jpg'%}");
+      background-size: 100% 100%; */
+
     }
 
     .container {
-      margin-top: 30px;
+      margin-top: 25px; 
+      padding-top: 20px;
+      background-color: #D3D3D3;
     }
 
     /* Custom styles for the animated cards */
@@ -92,6 +96,43 @@
       }
     }
 
+    .expert-container {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-top: 10px;
+      background-color: #f8f9fa;
+    }
+    
+    .expert-container.disabled {
+      background-color: #eee;
+    }
+    
+    .expert-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    
+    .form-check-input:checked ~ .expert-container {
+      background-color: #e2f0fb;
+    }
+    
+    .form-check-input:checked ~ .expert-container.disabled {
+      background-color: #eee;
+    }
+    
+    .form-check-input:checked ~ .expert-container label {
+      color: #007bff;
+    }
+    
+    .form-check-input:checked ~ .expert-container input {
+      cursor: default;
+    }
+    
+    .form-check-input:checked ~ .expert-container.disabled input {
+      cursor: not-allowed;
+    }
+  
   </style>
 </head>
 
@@ -112,7 +153,7 @@
             </div>
           </div> 
           <div class="col-lg-6">
-            <div class="user-card" id="expert" onclick="selectUser('expertContainer', this)">
+            <div class="user-card" id="expertxxx" onclick="selectUser('expertContainer', this)">
               <h5 class="card-title text-center">Expert</h5>
               {% comment %} <p>Advanced operations</p> {% endcomment %}
             </div>
@@ -124,24 +165,76 @@
         <div id="containerWrapper">
 
           <div id="basicContainer">
-            <form id="basicForm" method="POST">
+            <form id="form" method="POST">
               {% csrf_token %}
-              <input type="hidden", name="userType", value="basic" />
               <div class="form-group">
                 <label for="basicInput">Target Stock:</label>
-                {% render_field form.name class="form-control fs-3 text-center" id="basicInput" type="text" onchange="submitBasicForm()" %}
+                {% render_field form.name class="form-control fs-3 text-center" id="basicInput" type="text" onchange="submitForm()" %}
               </div>
+              
+              <br />
+
+              <div class="form-group">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="expertCheckbox" onchange="toggleExpertMode()">
+                  <label class="form-check-label" for="expertCheckbox">
+                    Show Expert Operations
+                  </label>
+                </div>
+              </div>
+              
+              <div id="expert" class="expert-container" style="display: none;">
+                <h4 class="expert-title">Expert Mode</h4>
+              
+                <br />
+              
+                <div class="form-group">
+                  <label for="ml_model">ML Model:</label>
+                  {% render_field form.ml_model class="form-control fs-3 text-center" id="ml_model" type="text" %} 
+                </div>
+              
+                <br />
+              
+                <div class="form-group">
+                  <label for="num_of_days">Number of Prediction Days:</label>
+                  {% render_field form.num_of_days class="form-control fs-3 text-center" id="num_of_days" type="text" %} 
+                </div>
+              </div>
+              
+              <br />
+              
+              <button class="btn btn-primary btn-lg" type="submit">Submit</button>
+              
             </form>
           </div>
 
+
+
           <div id="expertContainer" style="display: none;">
-            <form id="expertForm" method="POST">
+            <form id="form" method="POST">
               {% csrf_token %}
-              <input type="hidden", name="userType", value="expert" />
               <div class="form-group">
                 <label for="expertInput">Target Stock:</label>
-                {% render_field form.name class="form-control fs-3 text-center" id="expertInput" type="text" onchange="submitExpertForm()" %} 
+                {% render_field form.name class="form-control fs-3 text-center" id="expertInput" type="text" %} 
               </div>
+
+              <br />
+
+              <div class="form-group">
+                <label for="expertInput">ML Models:</label>
+                {% render_field form.ml_model class="form-control fs-3 text-center" id="expertInput" type="text" %} 
+              </div>
+
+              <br />
+
+              <div class="form-group">
+                <label for="expertInput">Number of Prediction Days:</label>
+                {% render_field form.num_of_days class="form-control fs-3 text-center" id="expertInput" type="text" %} 
+              </div>
+
+              <br />
+
+              <button class="btn btn-primary btn-lg" type="submit">Submit</button>
             </form>
           </div>
         </div>
@@ -153,28 +246,53 @@
       <div class="col-lg-9">
         <div class="row">
           <div class="col-lg-12">
-            <div class="chart-container" id="chart1"></div>
+            <div class="chart-container" id="chart1">
+              {% autoescape off %}
+                {{ forecast }}
+              {% endautoescape %}
+            </div>
           </div>
         </div>
         <div class="row">
           <div class="col-lg-4">
-            <div class="chart-container" id="chart2"></div>
+            <div class="chart-container" id="chart2">
+              <h3>Next Prediction</h3>
+              {% autoescape off %}
+                {{ nextpredict }}
+              {% endautoescape %}
+            </div>
           </div>
           <div class="col-lg-4">
-            <div class="chart-container" id="chart3"></div>
+            <div class="chart-container" id="chart3">
+              <h3>5-Day Prediction</h3>
+              {% autoescape off %}
+                {{ fivedayspredict }}
+              {% endautoescape %}
+            </div>
           </div>
           <div class="col-lg-4">
-            <div class="chart-container" id="chart4"></div>
+            <div class="chart-container" id="chart4">
+              <h3>10-Day Prediction </h3>
+              {% autoescape off %}
+                {{ tendayspredict }}
+              {% endautoescape %}
+            </div>
           </div>
         </div>
         <div class="row">
           <div class="col-lg-12">
             <div class="row">
               <div class="col-lg-6">
-                <div class="chart-container" id="chart5"></div>
+                <div class="chart-container" id="chart5">
+                  <h3> Prediction Table</h3>
+                </div>
               </div>
               <div class="col-lg-6">
-                <div class="chart-container" id="chart6"></div>
+                <div class="chart-container" id="chart6">
+                  {% autoescape off %}
+                    {{ recommendation }}
+                  {% endautoescape %}
+                </div>
               </div>
             </div>
           </div>
@@ -205,13 +323,22 @@
       }
     }
     
-    function submitBasicForm() {
-      document.getElementById('basicForm').submit();
+    function toggleExpertMode() {
+      var expertContainer = document.getElementById("expert");
+      var checkbox = document.getElementById("expertCheckbox");
+    
+      if (checkbox.checked) {
+        expertContainer.style.display = "block";
+      } else {
+        expertContainer.style.display = "none";
+      }
+    }
+    
+
+    function submitForm() {
+      document.getElementById('form').submit();
     }
 
-    function submitExpertForm() {
-      document.getElementById('expertForm').submit();
-    }
   </script>
   
 </body>

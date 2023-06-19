@@ -23,3 +23,4 @@
 %pip install django
 %pip install django-widget-tweaks
 %pip install django-bootstrap-v5
+%pip install yahooquery

@@ -1,20 +1,32 @@
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Stock(models.Model):
-    Apple = 'AAPL'
-    Google = 'GOOGL'
-    Microsoft = 'MSFT'
 
     STOCK_CHOICES = [
-        (Google, 'GOOGL'),
-        (Apple, 'AAPL'),
-        (Microsoft, 'MSFT'),
+        ('GOOGL', 'Google'),
+        ('AAPL', 'Apple'),
+        ('MSFT', 'Microsoft'),
     ]
 
+    MODEL_CHOICES = [
+        ('voting_model', 'Voting'),
+        ('svr_model', 'SVR'),
+        ('rfr_model', 'RFR'),
+    ]
 
-    userType = models.CharField(max_length=10)
-    
     name = models.CharField(
-        max_length=10, choices=STOCK_CHOICES, default=Google)
+        max_length=10, choices=STOCK_CHOICES, default='Google')
+    
+    ml_model = models.CharField(max_length=15, choices=MODEL_CHOICES, default='Voting')
+
+    num_of_days = models.IntegerField(
+        default=10,
+        validators=[
+            MinValueValidator(5),
+            MaxValueValidator(20)
+        ]
+    )
+    
     
     

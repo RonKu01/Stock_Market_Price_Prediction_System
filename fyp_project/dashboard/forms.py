@@ -4,4 +4,4 @@ from .models import Stock
 class StockForm(forms.ModelForm):
     class Meta:
         model = Stock
-        fields = ('name','userType',)
+        fields = ('name','ml_model', 'num_of_days')
