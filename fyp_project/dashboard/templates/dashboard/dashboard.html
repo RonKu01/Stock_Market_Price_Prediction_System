@@ -268,6 +268,26 @@
     </div>
   </div>
 
+  <!-- Modal -->
+  <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle">Information</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="modalBody">
+          <!-- Message content goes here -->
+          test
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
   <script>
     function selectUser(containerId, card) {
       const containers = document.querySelectorAll('.user-card');
@@ -293,9 +313,21 @@
     
       if (checkbox.checked) {
         expertContainer.style.display = "block";
+        showModal("Expert Mode Enabled", "You have enabled expert mode.");
       } else {
         expertContainer.style.display = "none";
       }
+    }
+
+    function showModal(title, message) {
+      var modalTitle = document.getElementById("modalTitle");
+      var modalBody = document.getElementById("modalBody");
+  
+      modalTitle.textContent = title;
+      modalBody.textContent = message;
+  
+      var myModal = new bootstrap.Modal(document.getElementById("infoModal"));
+      myModal.show();
     }
     
 
