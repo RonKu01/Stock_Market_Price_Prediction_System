@@ -314,7 +314,7 @@ def dashboard(request):
 
     # endregion
 
-    last_close_price = df_actual['Close'][-1]
+    last_close_price = df_actual['Close'][-5]
 
     nextpredict = round(nextpredict, 2)
     fivedayspredict = round(fivedayspredict, 2)
