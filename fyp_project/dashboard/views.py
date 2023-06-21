@@ -85,7 +85,7 @@ def dashboard(request):
                 scaler = pickle.load(f)
 
     last_index_date = df['Date'].tail(1).astype('str').values[0]
-    start_index_date = df['Date'].tail(30).head(1).astype('str').values[0]
+    start_index_date = df['Date'].tail(60).head(1).astype('str').values[0]
 
     # Download latest 30 days historical price data from Yahoo Finance and store in a pandas DataFrame
     df_actual = yf.download(SelectedStock, start=start_index_date, end=last_index_date, progress=False)
@@ -314,7 +314,7 @@ def dashboard(request):
 
     # endregion
 
-    last_close_price = df_actual['Close'][-5]
+    last_close_price = df_actual['Close'][-1]
 
     nextpredict = round(nextpredict, 2)
     fivedayspredict = round(fivedayspredict, 2)
