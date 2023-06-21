@@ -7,26 +7,27 @@ from yahooquery import Ticker
 import plotly.graph_objects as go
 from plotly.offline import plot
 
-df = pd.read_csv('dashboard/models/df.csv')
-X = pd.read_csv('dashboard/models/X.csv')
-
-with open('dashboard/models/rfr.pkl', 'rb') as f:
-    rfr_model = pickle.load(f)
-    
-with open('dashboard/models/svr.pkl', 'rb') as f:
-    svr_model = pickle.load(f)
-
-with open('dashboard/models/voting.pkl', 'rb') as f:
-    voting_model = pickle.load(f)
-    
-with open('dashboard/models/scaler.pkl', 'rb') as f:
-    scaler = pickle.load(f)
 
 def dashboard(request):
     form = StockForm()
     SelectedStock = 'GOOGL'
     ml_model = 'voting_model'
     num_of_days = 10
+
+    df = pd.read_csv('dashboard/models/google/df.csv')
+    X = pd.read_csv('dashboard/models/google/X.csv')
+
+    with open('dashboard/models/google/rfr.pkl', 'rb') as f:
+        rfr_model = pickle.load(f)
+        
+    with open('dashboard/models/google/svr.pkl', 'rb') as f:
+        svr_model = pickle.load(f)
+
+    with open('dashboard/models/google/voting.pkl', 'rb') as f:
+        voting_model = pickle.load(f)
+        
+    with open('dashboard/models/google/scaler.pkl', 'rb') as f:
+        scaler = pickle.load(f)
 
     if request.method == "POST":
         form = StockForm(request.POST)
@@ -37,7 +38,51 @@ def dashboard(request):
 
         SelectedStock = form.cleaned_data['name']
 
-    print(SelectedStock, ml_model)
+        if SelectedStock == 'GOOGL':
+            df = pd.read_csv('dashboard/models/google/df.csv')
+            X = pd.read_csv('dashboard/models/google/X.csv')
+
+            with open('dashboard/models/google/rfr.pkl', 'rb') as f:
+                rfr_model = pickle.load(f)
+                
+            with open('dashboard/models/google/svr.pkl', 'rb') as f:
+                svr_model = pickle.load(f)
+
+            with open('dashboard/models/google/voting.pkl', 'rb') as f:
+                voting_model = pickle.load(f)
+                
+            with open('dashboard/models/google/scaler.pkl', 'rb') as f:
+                scaler = pickle.load(f)
+        elif SelectedStock == 'AAPL':
+            df = pd.read_csv('dashboard/models/apple/df.csv')
+            X = pd.read_csv('dashboard/models/apple/X.csv')
+
+            with open('dashboard/models/apple/rfr.pkl', 'rb') as f:
+                rfr_model = pickle.load(f)
+                
+            with open('dashboard/models/apple/svr.pkl', 'rb') as f:
+                svr_model = pickle.load(f)
+
+            with open('dashboard/models/apple/voting.pkl', 'rb') as f:
+                voting_model = pickle.load(f)
+                
+            with open('dashboard/models/apple/scaler.pkl', 'rb') as f:
+                scaler = pickle.load(f)
+        else:
+            df = pd.read_csv('dashboard/models/microsoft/df.csv')
+            X = pd.read_csv('dashboard/models/microsoft/X.csv')
+
+            with open('dashboard/models/microsoft/rfr.pkl', 'rb') as f:
+                rfr_model = pickle.load(f)
+                
+            with open('dashboard/models/microsoft/svr.pkl', 'rb') as f:
+                svr_model = pickle.load(f)
+
+            with open('dashboard/models/microsoft/voting.pkl', 'rb') as f:
+                voting_model = pickle.load(f)
+                
+            with open('dashboard/models/microsoft/scaler.pkl', 'rb') as f:
+                scaler = pickle.load(f)
 
     last_index_date = df['Date'].tail(1).astype('str').values[0]
     start_index_date = df['Date'].tail(30).head(1).astype('str').values[0]
@@ -119,6 +164,12 @@ def dashboard(request):
             )             
         )
 
+
+
+        nextpredict = df_forecast['SVR Prediction'][0]
+        fivedayspredict = df_forecast['SVR Prediction'][4]
+        tendayspredict = df_forecast['SVR Prediction'][9]
+
     if ml_model == 'rfr_model':
         forecast_graphs.append(
             go.Scatter(
@@ -129,6 +180,10 @@ def dashboard(request):
             )             
         )
 
+        nextpredict = df_forecast['RFR Prediction'][0]
+        fivedayspredict = df_forecast['RFR Prediction'][4]
+        tendayspredict = df_forecast['RFR Prediction'][9]
+
     if ml_model == 'voting_model':
         forecast_graphs.append(
             go.Scatter(
@@ -138,6 +193,10 @@ def dashboard(request):
                 name='Voting Prediction'
             )             
         )
+
+        nextpredict = df_forecast['Voting Prediction'][0]
+        fivedayspredict = df_forecast['Voting Prediction'][4]
+        tendayspredict = df_forecast['Voting Prediction'][9]
 
     # Create layout
     forecast_graphs_layout = go.Layout(
@@ -151,6 +210,30 @@ def dashboard(request):
     # Getting HTML needed to render the plot.
     forecast = plot({'data': forecast_graphs, 'layout': forecast_graphs_layout},
                 output_type='div')
+    
+    # endregion
+
+    # region Volume
+    volume_history = df_combined2['Volume']
+    weekly_volume = volume_history.resample('W').sum()
+
+
+    volume_graph = go.Bar(
+                    x=weekly_volume.index,
+                    y=weekly_volume.values,
+                    name='Volume'
+                )
+    
+    # Create layout
+    volume_graphs_layout = go.Layout(
+        title='Volume History for ' + SelectedStock,
+        xaxis=dict(title='Date'),
+        yaxis=dict(title='Volume'),
+        showlegend=True,
+        title_font=dict(size=25, family='Arial', color='black'),
+    )
+
+    volume = plot({'data': volume_graph, 'layout': volume_graphs_layout}, output_type='div')
 
     # endregion
 
@@ -228,16 +311,31 @@ def dashboard(request):
 
     # Getting HTML needed to render the plot.
     recommendation = plot(indicator, output_type='div')
+
     # endregion
 
-    context = {'form': form,
-                    'SelectedStock': SelectedStock,
-                    'forecast': forecast,
-                    'nextpredict': '123.45',
-                    'fivedayspredict': '223.32',
-                    'tendayspredict': '113.32', 
-                    'recommendation': recommendation,
-                }
+    last_close_price = df_actual['Close'][-1]
+
+    nextpredict = round(nextpredict, 2)
+    fivedayspredict = round(fivedayspredict, 2)
+    tendayspredict = round(tendayspredict, 2)
+
+    nextpredict_change = round(((nextpredict - last_close_price) / last_close_price) * 100, 2)
+    fivedayspredict_change = round(((fivedayspredict - last_close_price) / last_close_price) * 100, 2)
+    tendayspredict_change = round(((tendayspredict - last_close_price) / last_close_price) * 100, 2)
+    
+    context = { 'form'            : form,
+                'SelectedStock'   : SelectedStock,
+                'forecast'        : forecast,
+                'nextpredict'     : nextpredict,
+                'fivedayspredict' : fivedayspredict,
+                'tendayspredict'  : tendayspredict,
+                'nextpredict_change': nextpredict_change,
+                'fivedayspredict_change':fivedayspredict_change,
+                'tendayspredict_change':tendayspredict_change,
+                'volume'          : volume,
+                'recommendation'  : recommendation,
+            }
             
     return render(request, 'dashboard/dashboard.html', context)
 

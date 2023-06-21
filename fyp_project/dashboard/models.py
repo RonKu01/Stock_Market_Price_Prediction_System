@@ -23,7 +23,7 @@ class Stock(models.Model):
     num_of_days = models.IntegerField(
         default=10,
         validators=[
-            MinValueValidator(5),
+            MinValueValidator(10),
             MaxValueValidator(20)
         ]
     )
