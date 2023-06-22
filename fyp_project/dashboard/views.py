@@ -213,6 +213,18 @@ def dashboard(request):
     
     # endregion
 
+    # region Predictions
+    last_close_price = df_actual['Close'][-1]
+
+    nextpredict = round(nextpredict, 2)
+    fivedayspredict = round(fivedayspredict, 2)
+    tendayspredict = round(tendayspredict, 2)
+
+    nextpredict_change = round(((nextpredict - last_close_price) / last_close_price) * 100, 2)
+    fivedayspredict_change = round(((fivedayspredict - last_close_price) / last_close_price) * 100, 2)
+    tendayspredict_change = round(((tendayspredict - last_close_price) / last_close_price) * 100, 2)
+    # endregion
+    
     # region Volume
     volume_history = df_combined2['Volume']
     weekly_volume = volume_history.resample('W').sum()
@@ -238,23 +250,25 @@ def dashboard(request):
     # endregion
 
     # region Recommendation
-    selectedstock = Ticker(SelectedStock)
-    recommendation_trend = selectedstock.recommendation_trend
+    if tendayspredict_change > 3:
+        value = 0.9
+    elif tendayspredict_change > 1:
+        value = 0.7
+    elif tendayspredict_change > -3 and tendayspredict_change < 1:
+        value = 0.5   
+    elif tendayspredict_change < -1:
+        value = 0.3
+    elif tendayspredict_change < -3:
+        value = 0.1
 
-    strong_buy = recommendation_trend['strongBuy'][0]
-    buy = recommendation_trend['buy'][0]
-    hold = recommendation_trend['hold'][0]
-    sell = recommendation_trend['sell'][0]
-    strong_sell = recommendation_trend['strongSell'][0]
-
-    total_recommendations = strong_buy + buy + hold + sell + strong_sell
-    value = (buy + strong_buy) / total_recommendations
+    total_recommendations = 1
+    value = value / total_recommendations
 
     indicator = go.Figure(
         go.Indicator(
             mode="gauge+number",
             value=value,
-            title={'text': "Recommendation Trend"},
+            title={'text': "Recommendation Trend", 'font': {'size': 23}},
             gauge={
                 'axis': {'range': [0, 1], 'tickwidth': 1, 'tickcolor': "darkblue"},
                 'bar': {'color': 'rgba(50, 175, 255, 0.7)'},
@@ -269,11 +283,12 @@ def dashboard(request):
                     {'range': [0.8, 1], 'color': 'rgba(0, 200, 0, 0.6)', 'name': 'Strong Buy'}
                 ],
                 'threshold': {
-                    'line': {'color': "red", 'width': 5},
+                    'line': {'color': "red", 'width': 4},
                     'thickness': 0.75,
                     'value': value
                 }
-            }
+            },
+            number={'font': {'size': 20}}
         )
     )
 
@@ -281,23 +296,23 @@ def dashboard(request):
 
     if value < 0.2:
         annotations.append(
-            dict(x=0.5, y=0.5, text="Strong Sell", showarrow=False, font={'size': 12, 'color': 'red'})
+            dict(x=0.5, y=0.2, text="Strong Sell", showarrow=False, font={'size': 30, 'color': 'red'})
         )
     elif value < 0.4:
         annotations.append(
-            dict(x=0.5, y=0.5, text="Sell", showarrow=False, font={'size': 12, 'color': 'orange'})
+            dict(x=0.5, y=0.2, text="Sell", showarrow=False, font={'size': 30, 'color': 'orange'})
         )
     elif value < 0.6:
         annotations.append(
-            dict(x=0.5, y=0.5, text="Neutral", showarrow=False, font={'size': 12, 'color': 'gold'})
+            dict(x=0.5, y=0.2, text="Neutral", showarrow=False, font={'size': 30, 'color': 'gold'})
         )
     elif value < 0.8:
         annotations.append(
-            dict(x=0.5, y=0.5, text="Buy", showarrow=False, font={'size': 12, 'color': 'lightgreen'})
+            dict(x=0.5, y=0.2, text="Buy", showarrow=False, font={'size': 30, 'color': 'lightgreen'})
         )
     else:
         annotations.append(
-            dict(x=0.5, y=0.5, text="Strong Buy", showarrow=False, font={'size': 12, 'color': 'green'})
+            dict(x=0.5, y=0.2, text="Strong Buy", showarrow=False, font={'size': 30, 'color': 'green'})
         )
 
     layout = go.Layout(
@@ -314,16 +329,6 @@ def dashboard(request):
 
     # endregion
 
-    last_close_price = df_actual['Close'][-1]
-
-    nextpredict = round(nextpredict, 2)
-    fivedayspredict = round(fivedayspredict, 2)
-    tendayspredict = round(tendayspredict, 2)
-
-    nextpredict_change = round(((nextpredict - last_close_price) / last_close_price) * 100, 2)
-    fivedayspredict_change = round(((fivedayspredict - last_close_price) / last_close_price) * 100, 2)
-    tendayspredict_change = round(((tendayspredict - last_close_price) / last_close_price) * 100, 2)
-    
     context = { 'form'            : form,
                 'SelectedStock'   : SelectedStock,
                 'forecast'        : forecast,
