@@ -1,0 +1,111 @@
+.container {
+  margin-top: 25px; 
+  padding-top: 20px;
+  background-color: #D3D3D3;
+  border-radius: 10px;
+}
+
+/* Custom styles for the animated cards */
+.user-card {
+  background-color: #ffffff;
+  border-radius: 5px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.user-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.user-card.active {
+  background-color: #007bff; /* Change to your desired active color */
+  color: #fff; /* Change to your desired text color */
+}
+
+.user-card .card-title {
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+/* Custom styles for the chart containers */
+.chart-container {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+#chart1 {
+  height: 325px;
+}
+
+#chart2,
+#chart3,
+#chart4 {
+  height: 100px;
+}
+
+#chart5,
+#chart6 {
+  height: 275px;
+}
+
+@media (max-width: 768px) {
+  #chart1 {
+    height: 300px;
+  }
+
+  #chart2,
+  #chart3,
+  #chart4 {
+    height: 75px;
+  }
+
+  #chart5,
+  #chart6 {
+    height: 150px;
+  }
+}
+
+.expert-container {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-top: 10px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+}
+
+.expert-container.disabled {
+  background-color: #eee;
+}
+
+.expert-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.form-check-input:checked ~ .expert-container {
+  background-color: #e2f0fb;
+}
+
+.form-check-input:checked ~ .expert-container.disabled {
+  background-color: #eee;
+}
+
+.form-check-input:checked ~ .expert-container label {
+  color: #007bff;
+}
+
+.form-check-input:checked ~ .expert-container input {
+  cursor: default;
+}
+
+.form-check-input:checked ~ .expert-container.disabled input {
+  cursor: not-allowed;
+}
