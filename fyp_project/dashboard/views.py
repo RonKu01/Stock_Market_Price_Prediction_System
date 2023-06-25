@@ -3,6 +3,7 @@ from .forms import StockForm
 import yfinance as yf
 import pickle
 import pandas as pd
+import numpy as np
 from yahooquery import Ticker
 import plotly.graph_objects as go
 from plotly.offline import plot
@@ -25,6 +26,9 @@ def dashboard(request):
 
     with open('dashboard/models/google/voting.pkl', 'rb') as f:
         voting_model = pickle.load(f)
+
+    with open('dashboard/models/google/lstm.pkl', 'rb') as f:
+        lstm_model = pickle.load(f)   
         
     with open('dashboard/models/google/scaler.pkl', 'rb') as f:
         scaler = pickle.load(f)
@@ -50,9 +54,13 @@ def dashboard(request):
 
             with open('dashboard/models/google/voting.pkl', 'rb') as f:
                 voting_model = pickle.load(f)
-                
+
+            with open('dashboard/models/google/lstm.pkl', 'rb') as f:
+                lstm_model = pickle.load(f)   
+                        
             with open('dashboard/models/google/scaler.pkl', 'rb') as f:
                 scaler = pickle.load(f)
+
         elif SelectedStock == 'AAPL':
             df = pd.read_csv('dashboard/models/apple/df.csv')
             X = pd.read_csv('dashboard/models/apple/X.csv')
@@ -65,6 +73,9 @@ def dashboard(request):
 
             with open('dashboard/models/apple/voting.pkl', 'rb') as f:
                 voting_model = pickle.load(f)
+
+            with open('dashboard/models/apple/lstm.pkl', 'rb') as f:
+                lstm_model = pickle.load(f)   
                 
             with open('dashboard/models/apple/scaler.pkl', 'rb') as f:
                 scaler = pickle.load(f)
@@ -80,6 +91,9 @@ def dashboard(request):
 
             with open('dashboard/models/microsoft/voting.pkl', 'rb') as f:
                 voting_model = pickle.load(f)
+
+            with open('dashboard/models/microsoft/lstm.pkl', 'rb') as f:
+                lstm_model = pickle.load(f)   
                 
             with open('dashboard/models/microsoft/scaler.pkl', 'rb') as f:
                 scaler = pickle.load(f)
@@ -104,9 +118,13 @@ def dashboard(request):
     y_rfr_pred = rfr_model.predict(X_pred)
     y_voting_pred = voting_model.predict(X_pred)
 
+    X_pred_reshaped = np.reshape(X_pred, (X_pred.shape[0], X_pred.shape[1], 1))
+    y_lstm_pred= lstm_model.predict(X_pred_reshaped)
+
     df_pred = pd.DataFrame({'SVR Prediction': y_svr_pred,
-            'RFR Prediction': y_rfr_pred,
-            'Voting Prediction': y_voting_pred}, index=df_actual.index)
+                            'RFR Prediction': y_rfr_pred,
+                            'Voting Prediction': y_voting_pred,
+                            'LSTM Prediction': np.squeeze(y_lstm_pred)}, index=df_actual.index)
 
     df_combined = pd.concat([df_actual, df_pred], axis=1)
 
@@ -132,10 +150,14 @@ def dashboard(request):
     rfr_prediction = rfr_model.predict(last_data_scaled)
     voting_prediction = voting_model.predict(last_data_scaled)
 
+    last_data_scaled_reshaped = np.reshape(last_data_scaled, (last_data_scaled.shape[0], last_data_scaled.shape[1], 1))
+    lstm_prediction= lstm_model.predict(last_data_scaled_reshaped)
+
     # Assign the forecasted prices to the DataFrame columns
     df_forecast['SVR Prediction'] = svr_prediction
     df_forecast['RFR Prediction'] = rfr_prediction
     df_forecast['Voting Prediction'] = voting_prediction
+    df_forecast['LSTM Prediction'] = lstm_prediction
 
     # Set the display format for float values
     pd.set_option('display.float_format', lambda x: '%.3f' % x)
@@ -197,6 +219,21 @@ def dashboard(request):
         nextpredict = df_forecast['Voting Prediction'][0]
         fivedayspredict = df_forecast['Voting Prediction'][4]
         tendayspredict = df_forecast['Voting Prediction'][9]
+
+    if ml_model == 'lstm_model':
+        forecast_graphs.append(
+            go.Scatter(
+                x=df_combined2.index,
+                y=df_combined2['LSTM Prediction'],
+                mode='lines',
+                name='LSTM Prediction'
+            )             
+        )
+
+        nextpredict = df_forecast['Voting Prediction'][0]
+        fivedayspredict = df_forecast['Voting Prediction'][4]
+        tendayspredict = df_forecast['Voting Prediction'][9]
+
 
     # Create layout
     forecast_graphs_layout = go.Layout(

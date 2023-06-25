@@ -13,6 +13,7 @@ class Stock(models.Model):
         ('voting_model', 'Voting'),
         ('svr_model', 'SVR'),
         ('rfr_model', 'RFR'),
+        ('lstm_model', 'LSTM'),
     ]
 
     name = models.CharField(
