@@ -10,207 +10,189 @@
 
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>FYP Dashboard</title>
+    <title>FYP Dashboard</title>
 
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
-  <link rel="shortcut icon" type="image/png" href="{% static 'favicon.png' %}" >
-</head>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'favicon.png' %}" >
+  </head>
 
-<body>
-  <div class="container">
-    <div class="row">
+  <body>
+    <div class="container">
+      <div class="row">
 
-      <!-- Configurations Section -->
-      <div class="col-lg-3">
-        <h2 class="text-center">Stock Market Price Prediction System</h2>
+        <!-- Configurations Section -->
+        <div class="col-lg-3">
+          <h2 class="text-center">Stock Market Price Prediction System</h2>
 
-        <div class="row">
-          <p>Pellentesque habiratermesent tortor neque 
-            egestas augue, tortor neque egestas 
-            augue, eeu vulputate magna eros eu erat. 
-            Aliquam erat volutpat. Nam dui mi, 
-            tincidunt quis, accumsan porttitor, facilisis
-            uctus, metus
-          </p>
-        </div>
+          <div class="row">
+            <p>This system predicts stock prices which 
+              helps investors discover the future values of company stock. 
+              The system is trained from historical data and find any unseen pattern & insight. 
+              It built to provide helpful trade signals for the investors to buy/sell. 
+            </p>
+          </div>
 
-        <hr />
+          <hr />
 
-        <div id="containerWrapper">
-          <div id="basicContainer">
-            <form id="form" method="POST">
-              {% csrf_token %}
-              <div class="form-group">
-                <label for="basicInput">Target Stock:</label>
-                {% render_field form.name class="form-control fs-3 text-center" id="basicInput" type="text" onchange="submitForm()" %}
-              </div>
-              
-              <br />
-
-              <div class="form-group">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="expertCheckbox" onchange="toggleExpertMode()">
-                  <label class="form-check-label" for="expertCheckbox">
-                    Show Expert Operations
-                  </label>
+          <div id="containerWrapper">
+            <div id="basicContainer">
+              <form id="form" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label for="basicInput">Target Stock:</label>
+                  {% render_field form.name class="form-control fs-3 text-center" id="basicInput" type="text" onchange="submitForm()" %}
                 </div>
-              </div>
-              
-              <div id="expert" class="expert-container" style="display: none;">
-                <h2 class="expert-title">Expert Mode</h2>
+                
+                <br />
 
                 <div class="form-group">
-                  <label for="ml_model">ML Model:</label>
-                  {% render_field form.ml_model class="form-control fs-3 text-center" id="ml_model" type="text" %} 
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="expertCheckbox" onchange="toggleExpertMode()">
+                    <label class="form-check-label" for="expertCheckbox">
+                      Show Expert Operations
+                    </label>
+                  </div>
                 </div>
-              
-                <br />
-              
-                <div class="form-group">
-                  <label for="num_of_days">Number of Prediction Days:</label>
-                  {% render_field form.num_of_days class="form-control fs-3 text-center" id="num_of_days" type="number" min="10" max="20" %}
-                </div>
+                
+                <div id="expert" class="expert-container" style="display: none;">
+                  <h2 class="expert-title">Expert Mode</h2>
 
-                <br />
-                <div class="text-center">
-                  <button class="btn btn-primary btn-lg " type="submit">Submit</button>
-                </div>
-              </div>
-            </form>
-            <hr />
-          </div>
-        </div>
-      </div>
+                  <div class="form-group">
+                    <label for="ml_model">ML Model:</label>
+                    {% render_field form.ml_model class="form-control fs-3 text-center" id="ml_model" type="text" %} 
+                  </div>
+                
+                  <br />
+                
+                  <div class="form-group">
+                    <label for="num_of_days">Number of Prediction Days:</label>
+                    {% render_field form.num_of_days class="form-control fs-3 text-center" id="num_of_days" type="number" min="10" max="20" %}
+                  </div>
 
-    
-      <!-- Charts Section -->
-      <div class="col-lg-9">
-        <div class="row">
-          <div class="col-lg-12">
-            <div class="chart-container" id="chart1">
-              {% autoescape off %}
-                {{ forecast }}
-              {% endautoescape %}
+                  <br />
+                  <div class="text-center">
+                    <button class="btn btn-primary btn-lg " type="submit">Submit</button>
+                  </div>
+                </div>
+              </form>
+              <hr />
             </div>
           </div>
         </div>
-        <div class="row">
-          <div class="col-lg-4">
-            <div class="chart-container" id="chart2">
-              <div style="text-align: center; font-size: 30px;">
-                <h5>Next Prediction</h5>
+
+      
+        <!-- Charts Section -->
+        <div class="col-lg-9">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="chart-container" id="chart1">
                 {% autoescape off %}
-                  {% if nextpredict_change > 0 %}
-                    <p style="color: green;">{{ nextpredict }} (+{{ nextpredict_change }}%)</p>
-                  {% elif nextpredict_change < 0 %}
-                    <p style="color: red;">{{ nextpredict }} ({{ nextpredict_change }}%)</p>
-                  {% else %}
-                    <p>{{ nextpredict }} ({{ nextpredict_change }}%)</p>
-                  {% endif %}
+                  {{ forecast }}
                 {% endautoescape %}
               </div>
             </div>
           </div>
-          <div class="col-lg-4">
-            <div class="chart-container" id="chart3">
-              <div style="text-align: center; font-size: 30px;">
-                <h5>5-Day Prediction</h3>
-                {% autoescape off %}
-                  {% if fivedayspredict_change > 0 %}
-                    <p style="color: green;">{{ fivedayspredict }} (+{{ fivedayspredict_change }}%)</p>
-                  {% elif fivedayspredict_change < 0 %}
-                    <p style="color: red;">{{ fivedayspredict }} ({{ fivedayspredict_change }}%)</p>
-                  {% else %}
-                    <p>{{ fivedayspredict }} ({{ fivedayspredict_change }}%)</p>
-                  {% endif %}
-                {% endautoescape %}
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-4">
-            <div class="chart-container" id="chart4">
-              <div style="text-align: center; font-size: 30px;">
-                <h5>10-Day Prediction </h5>
-                {% autoescape off %}
-                  {% if tendayspredict_change > 0 %}
-                    <p style="color: green;">{{ tendayspredict }} (+{{ tendayspredict_change }}%)</p>
-                  {% elif tendayspredict_change < 0 %}
-                    <p style="color: red;">{{ tendayspredict }} ({{ tendayspredict_change }}%)</p>
-                  {% else %}
-                    <p>{{ tendayspredict }} ({{ tendayspredict_change }}%)</p>
-                  {% endif %}
-                {% endautoescape %}
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-lg-12">
-            <div class="row">
-              <div class="col-lg-6">
-                <div class="chart-container" id="chart5">
+          <div class="row">
+            <div class="col-lg-4">
+              <div class="chart-container" id="chart2">
+                <div style="text-align: center; font-size: 30px;">
+                  <h5>Next Prediction</h5>
                   {% autoescape off %}
-                    {{ volume }}
+                    {% if nextpredict_change > 0 %}
+                      <p style="color: green;">{{ nextpredict }} (+{{ nextpredict_change }}%)</p>
+                    {% elif nextpredict_change < 0 %}
+                      <p style="color: red;">{{ nextpredict }} ({{ nextpredict_change }}%)</p>
+                    {% else %}
+                      <p>{{ nextpredict }} ({{ nextpredict_change }}%)</p>
+                    {% endif %}
                   {% endautoescape %}
                 </div>
               </div>
-              <div class="col-lg-6">
-                <div class="chart-container" id="chart6">
+            </div>
+            <div class="col-lg-4">
+              <div class="chart-container" id="chart3">
+                <div style="text-align: center; font-size: 30px;">
+                  <h5>5-Day Prediction</h3>
                   {% autoescape off %}
-                    {{ recommendation }}
+                    {% if fivedayspredict_change > 0 %}
+                      <p style="color: green;">{{ fivedayspredict }} (+{{ fivedayspredict_change }}%)</p>
+                    {% elif fivedayspredict_change < 0 %}
+                      <p style="color: red;">{{ fivedayspredict }} ({{ fivedayspredict_change }}%)</p>
+                    {% else %}
+                      <p>{{ fivedayspredict }} ({{ fivedayspredict_change }}%)</p>
+                    {% endif %}
+                  {% endautoescape %}
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-4">
+              <div class="chart-container" id="chart4">
+                <div style="text-align: center; font-size: 30px;">
+                  <h5>10-Day Prediction </h5>
+                  {% autoescape off %}
+                    {% if tendayspredict_change > 0 %}
+                      <p style="color: green;">{{ tendayspredict }} (+{{ tendayspredict_change }}%)</p>
+                    {% elif tendayspredict_change < 0 %}
+                      <p style="color: red;">{{ tendayspredict }} ({{ tendayspredict_change }}%)</p>
+                    {% else %}
+                      <p>{{ tendayspredict }} ({{ tendayspredict_change }}%)</p>
+                    {% endif %}
                   {% endautoescape %}
                 </div>
               </div>
             </div>
           </div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="chart-container" id="chart5">
+                    {% autoescape off %}
+                      {{ volume }}
+                    {% endautoescape %}
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="chart-container" id="chart6">
+                    {% autoescape off %}
+                      {{ recommendation }}
+                    {% endautoescape %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+
+
+
       </div>
-
-
-
     </div>
-  </div>
 
-  <script>
-    function selectUser(containerId, card) {
-      const containers = document.querySelectorAll('.user-card');
-  
-      containers.forEach(function(container) {
-        container.classList.remove('active');
-      });
-  
-      card.classList.add('active');
-  
-      if (containerId === 'basicContainer') {
-        document.getElementById('basicContainer').style.display = 'block';
-        document.getElementById('expertContainer').style.display = 'none';
-      } else {
-        document.getElementById('expertContainer').style.display = 'block';
-        document.getElementById('basicContainer').style.display = 'none';
+    <script>
+      function toggleExpertMode() {
+        var expertContainer = document.getElementById("expert");
+        var checkbox = document.getElementById("expertCheckbox");
+      
+        if (checkbox.checked) {
+          expertContainer.style.display = "block";
+        } else {
+          expertContainer.style.display = "none";
+        }
       }
-    }
-    
-    function toggleExpertMode() {
-      var expertContainer = document.getElementById("expert");
-      var checkbox = document.getElementById("expertCheckbox");
-    
-      if (checkbox.checked) {
-        expertContainer.style.display = "block";
-      } else {
-        expertContainer.style.display = "none";
+
+      function submitForm() {
+        document.getElementById('form').submit();
       }
-    }
 
-    function submitForm() {
-      document.getElementById('form').submit();
-    }
-
-  </script>
-  
-</body>
+    </script>
+    
+  </body>
+</html>
 
 {% endblock %}
+
