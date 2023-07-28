@@ -7,7 +7,7 @@ Stock Market Price Prediction System is a system that accurately predicts stock 
 1. Install python (Version 3.10.3 or above)
 2. Go to terminal and type:
     pip install -r requirements.txt
-3. Open retrain_model.ipynb file and Run All (This may take around 20-30mins)
+3. Open ML_Training/retrain_model.ipynb file and Run All (This may take around 20-30mins)
 4. After all files run, open terminal and type :
     'python manage.py runserver'.
 5. When the server started to run, go to browser.
